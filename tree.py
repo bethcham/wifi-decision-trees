@@ -43,7 +43,7 @@ def find_best_split(dataset):
                     best_left_split = dataset[dataset[:, col] <= split_value]
                     best_right_split = dataset[dataset[:, col] > split_value]
     
-    return best_split_index, best_split_value, best_left_split, best_right_split, best_gain
+    return best_split_index, best_split_value, best_left_split, best_right_split, round(best_gain, 3)
 
 def decision_tree_learning(training_data, depth):
     labels = training_data[:, -1]
@@ -69,18 +69,18 @@ def decision_tree_learning(training_data, depth):
 
         return (node, max(l_depth, r_depth))
 
-def plot_tree(tree, depth=0, x=0.5, y=1.0, x_offset=0.25, y_offset=0.1, ax=None):
+def plot_tree(tree, depth=0, x=0.5, y=1.0, x_offset=0.7, y_offset=0.15, ax=None):
     if ax is None:
         ax = plt.gca()
     
     # check if it is a leaf node
     if "label" in tree:
-        label = f"Room: {tree['label']}"
+        label = f"R{tree['label']}"
         ax.text(x, y, label, ha='center', bbox=dict(boxstyle="round,pad=0.3", facecolor="lightblue", edgecolor="black"))
         return
     
     # plot split condition
-    label = f"X{tree['split_index']} <= {tree['split_value']:.2f}\nGain = {tree['gain']}"
+    label = f"X{tree['split_index']} <= {tree['split_value']:.2f}"
     ax.text(x, y, label, ha='center', bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgreen", edgecolor="black"))
     
     plot_tree(tree['left'], depth + 1, x - x_offset / (depth + 1), y - y_offset, x_offset, y_offset, ax)
@@ -90,13 +90,13 @@ def plot_tree(tree, depth=0, x=0.5, y=1.0, x_offset=0.25, y_offset=0.1, ax=None)
     ax.plot([x, x - x_offset / (depth + 1)], [y, y - y_offset], 'k-')
     ax.plot([x, x + x_offset / (depth + 1)], [y, y - y_offset], 'k-')
 
-clean_dataset = np.loadtxt("wifi_db/clean_dataset.txt")
-tree, depth = decision_tree_learning(clean_dataset, 0)
+dataset = np.loadtxt("wifi_db/clean_dataset.txt")
+tree, depth = decision_tree_learning(dataset, 0)
 
 print("Decision Tree:", tree)
 print("Depth: ", depth)
 
-fig, ax = plt.subplots(figsize=(10, 8))
+fig, ax = plt.subplots(figsize=(12, 10))
 ax.set_title("Decision Tree")
 plot_tree(tree)
 ax.axis("off")
